@@ -1,5 +1,5 @@
 import asyncio
-from telethon import TelegramClient, events
+from telethon import TelegramClient
 from telethon.tl.functions.channels import EditBannedRequest
 from telethon.tl.types import ChatBannedRights, ChannelParticipantsSearch
 
@@ -8,6 +8,9 @@ api_hash = "94e17044c2393f43fda31d3afe77b26b"
 bot_token = "7756558480:AAF-vp2SWzdeUOq2sl_V-w48VphfJ-sP5Pk"
 OWNER_ID = 8075557596
 
+# ✅ Replace this with your group ID (negative number)
+CHAT_ID = -1001428862998
+
 client = TelegramClient("banall_bot", api_id, api_hash).start(bot_token=bot_token)
 
 ban_rights = ChatBannedRights(
@@ -15,17 +18,11 @@ ban_rights = ChatBannedRights(
     view_messages=True
 )
 
-@client.on(events.NewMessage(pattern='/banall'))
-async def ban_all_handler(event):
-    sender = await event.get_sender()
-    chat = await event.get_chat()
-
-    if sender.id != OWNER_ID or not event.is_group:
-        return
-
-    await client.send_message(chat.id, "🚫 Banning all members... Please wait.")
-
+async def auto_ban_chat_members():
+    chat = await client.get_entity(CHAT_ID)
     total_banned = 0
+
+    print(f"🚫 Starting ban process in: {chat.title}")
 
     while True:
         banned_this_round = 0
@@ -47,7 +44,8 @@ async def ban_all_handler(event):
 
                 total_banned += 1
                 banned_this_round += 1
-                await asyncio.sleep(0.2)
+                print(f"Banned: {user.id}")
+                await asyncio.sleep(0.4)
 
             except Exception as e:
                 print(f"❌ Failed to ban {user.id}: {e}")
@@ -56,7 +54,11 @@ async def ban_all_handler(event):
         if banned_this_round == 0:
             break
 
-    await client.send_message(chat.id, f"✅ Finished banning total {total_banned} members.")
+    print(f"✅ Finished banning total {total_banned} members in '{chat.title}'.")
+
+async def main():
+    await auto_ban_chat_members()
 
 print("Bot is running...")
-client.run_until_disconnected()
+with client:
+    client.loop.run_until_complete(main())
