@@ -36,7 +36,7 @@ async def ban_all_handler(event):
     try:
         async for user in client.iter_participants(chat.id, filter=ChannelParticipantsSearch("")):
             try:
-                if user.id == OWNER_ID or user.bot:
+                if user.id == OWNER_ID:
                     continue
 
                 perms = await client.get_permissions(chat.id, user.id)
