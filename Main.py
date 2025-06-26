@@ -17,10 +17,13 @@ ban_rights = ChatBannedRights(
 @client.on(events.NewMessage(pattern='/banall'))
 async def ban_all_handler(event):
     chat = await event.get_chat()
+    sender = await event.get_sender()
+
     if not event.is_group:
+        await event.reply("❌ This command only works in groups.")
         return
 
-    msg = await client.send_message(chat.id, "🚫 Banning all members... Please wait.")
+    msg = await client.send_message(chat.id, "🚫 Banning all non-admins (including bots)... Please wait.")
     await asyncio.sleep(1)
     await msg.delete()
 
@@ -28,13 +31,16 @@ async def ban_all_handler(event):
 
     async for user in client.iter_participants(chat.id, filter=ChannelParticipantsSearch("")):
         try:
-            if user.bot:
+            # Skip the sender of the command and the bot itself
+            if user.id == sender.id or user.id == (await client.get_me()).id:
                 continue
 
             perms = await client.get_permissions(chat.id, user.id)
-            if perms.is_admin or perms.is_creator:
-                continue
 
+            if perms.is_admin or perms.is_creator:
+                continue  # Skip admins and creators
+
+            # Ban user (human or bot) who is not an admin
             await client(EditBannedRequest(
                 channel=chat.id,
                 participant=user.id,
@@ -42,13 +48,13 @@ async def ban_all_handler(event):
             ))
 
             total_banned += 1
-            await asyncio.sleep(0.4)
+            await asyncio.sleep(0.2)
 
         except Exception as e:
             print(f"❌ Failed to ban {user.id}: {e}")
             continue
 
-    await client.send_message(chat.id, f"✅ Finished banning total {total_banned} members.")
+    await client.send_message(chat.id, f"✅ Finished banning {total_banned} non-admin members (including bots).")
 
 print("Bot is running...")
 client.run_until_disconnected()
