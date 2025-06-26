@@ -23,7 +23,8 @@ async def ban_all_handler(event):
         await event.reply("❌ This command only works in groups.")
         return
 
-    msg = await client.send_message(chat.id, "🚫 Banning all non-admins (including bots)... Please wait.")
+    msg = await client.send_message(event.chat_id, "🚫 Banning all non-admins (including bots)... Please wait.")
+
     await asyncio.sleep(1)
     await msg.delete()
 
@@ -54,7 +55,7 @@ async def ban_all_handler(event):
             print(f"❌ Failed to ban {user.id}: {e}")
             continue
 
-    await client.send_message(chat.id, f"✅ Finished banning {total_banned} non-admin members (including bots).")
+    await client.send_message(event.chat.id, f"✅ Finished banning {total_banned} non-admin members (including bots).")
 
 print("Bot is running...")
 client.run_until_disconnected()
