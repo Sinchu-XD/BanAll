@@ -6,7 +6,6 @@ from telethon.tl.types import ChatBannedRights, ChannelParticipantsSearch
 api_id = 6067591
 api_hash = "94e17044c2393f43fda31d3afe77b26b"
 bot_token = "7756558480:AAF-vp2SWzdeUOq2sl_V-w48VphfJ-sP5Pk"
-OWNER_ID = 8166330046
 
 client = TelegramClient("banall_bot", api_id, api_hash).start(bot_token=bot_token)
 
@@ -17,10 +16,8 @@ ban_rights = ChatBannedRights(
 
 @client.on(events.NewMessage(pattern='/banall'))
 async def ban_all_handler(event):
-    sender = await event.get_sender()
     chat = await event.get_chat()
-
-    if sender.id != OWNER_ID or not event.is_group:
+    if not event.is_group:
         return
 
     msg = await client.send_message(chat.id, "🚫 Banning all members... Please wait.")
@@ -31,7 +28,7 @@ async def ban_all_handler(event):
 
     async for user in client.iter_participants(chat.id, filter=ChannelParticipantsSearch("")):
         try:
-            if user.id == OWNER_ID or user.bot:
+            if user.bot:
                 continue
 
             perms = await client.get_permissions(chat.id, user.id)
