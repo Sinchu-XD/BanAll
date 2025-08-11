@@ -5,7 +5,7 @@ from telethon.tl.types import ChatBannedRights, ChannelParticipantsSearch, Chann
 
 api_id = 6067591
 api_hash = "94e17044c2393f43fda31d3afe77b26b"
-bot_token = "7756558480:AAF-vp2SWzdeUOq2sl_V-w48VphfJ-sP5Pk"
+bot_token = "7282536736:AAH8VWBWU9F5ZAIATg5pDu1l1ouzke2s6dg"
 
 client = TelegramClient("banall_bot", api_id, api_hash).start(bot_token=bot_token)
 
